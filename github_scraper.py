@@ -1,9 +1,8 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import requests
 from bs4 import BeautifulSoup
 import webbrowser
-from tkinter import messagebox
 
 def scrape_github():
     github_link = github_link_entry.get()
@@ -14,6 +13,7 @@ def scrape_github():
         img_element = soup.find("img", class_="avatar-user")
         if img_element:
             image_url = img_element["src"]
+            image_url = image_url.replace("?s=64", "?")
             photo_link_entry.delete(0, tk.END)
             photo_link_entry.insert(tk.END, image_url)
             follow_button.config(state=tk.NORMAL)
@@ -51,104 +51,32 @@ def download_photo():
         messagebox.showwarning("Download Cancelled", "Download cancelled by user.")
 
 window = tk.Tk()
-window.title("Web Scraping")
+window.title("Web Scraper")
+window.geometry("500x350")
+window.configure(bg="#f0f0f0")
 
-window.configure(bg="#331D2C")
+heading_label = tk.Label(window, text="Web Scraper", font=("Arial", 16, "bold"), bg="#f0f0f0", fg="#333333")
+heading_label.pack(pady=10)
 
-window.geometry("500x400")
-window.update_idletasks()
-window_height = window.winfo_height()
-screen_height = window.winfo_screenheight()
-y_offset = (screen_height - window_height) // 2
-window.geometry(f"500x400+{window.winfo_x()}+{y_offset}")
+github_link_label = tk.Label(window, text="Enter GitHub Profile Link:", font=("Arial", 10), bg="#f0f0f0", fg="#333333")
+github_link_label.pack()
 
-container_frame = tk.Frame(window, bg="#331D2C")
-container_frame.pack(expand=True)
+github_link_entry = tk.Entry(window, width=40, font=("Arial", 10))
+github_link_entry.pack(pady=5)
 
-heading_label = tk.Label(
-    container_frame,
-    text="Web Scraping",
-    font=("Arial", 48),
-    fg="#97FEED",
-    bg="#331D2C",
-)
-heading_label.pack(pady=(50, 20))
+submit_button = tk.Button(window, text="Submit", command=scrape_github, bg="#4287f5", fg="white")
+submit_button.pack(pady=10)
 
-form_frame = tk.Frame(container_frame, bg="#331D2C")
-form_frame.pack()
+photo_link_label = tk.Label(window, text="Profile Photo Link:", font=("Arial", 10), bg="#f0f0f0", fg="#333333")
+photo_link_label.pack()
 
-github_link_label = tk.Label(
-    form_frame,
-    text="Enter the Github user link:",
-    font=("Arial", 16),
-    fg="#068FFF",
-    bg="#331D2C",
-)
-github_link_label.grid(row=0, column=0, padx=10, pady=(0, 10))
+photo_link_entry = tk.Entry(window, width=40, font=("Arial", 10))
+photo_link_entry.pack(pady=5)
 
-github_link_entry = tk.Entry(form_frame, width=50, font=("Arial", 12))
-github_link_entry.grid(row=0, column=1, padx=10, pady=(0, 10))
+follow_button = tk.Button(window, text="Follow Link", command=follow_link, state=tk.DISABLED, bg="#4287f5", fg="white")
+follow_button.pack(pady=5)
 
-scrape_button = tk.Button(
-    form_frame,
-    text="Submit",
-    font=("Arial", 12),
-    bg="black",
-    fg="white",
-    relief=tk.FLAT,
-    command=scrape_github,
-)
-scrape_button.grid(row=0, column=2, padx=10, pady=(0, 10))
-
-result_frame = tk.Frame(container_frame, bg="#331D2C")
-result_frame.pack(pady=(20, 50))
-
-photo_link_label = tk.Label(
-    result_frame,
-    text="Github profile photo link:",
-    font=("Arial", 16),
-    fg="#068FFF",
-    bg="#331D2C",
-)
-photo_link_label.grid(row=0, column=0, padx=10, pady=(0, 10))
-
-photo_link_entry = tk.Entry(result_frame, width=50, font=("Arial", 12))
-photo_link_entry.grid(row=0, column=1, padx=10, pady=(0, 10))
-
-follow_button = tk.Button(
-    result_frame,
-    text="Follow Link",
-    font=("Arial", 12),
-    bg="black",
-    fg="white",
-    relief=tk.FLAT,
-    state=tk.DISABLED,
-    command=follow_link,
-)
-follow_button.grid(row=0, column=2, padx=10, pady=(0, 10))
-
-download_button = tk.Button(
-    result_frame,
-    text="Download",
-    font=("Arial", 12),
-    bg="black",
-    fg="white",
-    relief=tk.FLAT,
-    state=tk.DISABLED,
-    command=download_photo,
-)
-download_button.grid(row=0, column=3, padx=10, pady=(0, 10))
-
-form_frame.columnconfigure(0, weight=1)
-form_frame.columnconfigure(1, weight=2)
-form_frame.columnconfigure(2, weight=1)
-
-result_frame.columnconfigure(0, weight=1)
-result_frame.columnconfigure(1, weight=2)
-result_frame.columnconfigure(2, weight=1)
-result_frame.columnconfigure(3, weight=1)
-
-form_frame.grid_rowconfigure(0, pad=10)
-result_frame.grid_rowconfigure(0, pad=10)
+download_button = tk.Button(window, text="Download Photo", command=download_photo, state=tk.DISABLED, bg="#4287f5", fg="white")
+download_button.pack(pady=5)
 
 window.mainloop()
